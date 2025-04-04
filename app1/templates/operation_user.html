@@ -1,0 +1,160 @@
+{{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operation Users | Math Nexus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        .navbar {
+            background: rgba(0, 0, 0, 0.3) !important;
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff !important;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #7b61ff;
+            box-shadow: 0 0 0 0.25rem rgba(123, 97, 255, 0.25);
+        }
+        .btn-glow {
+            background: linear-gradient(45deg, #7b61ff, #9b82ff);
+            border: none;
+            padding: 10px 25px;
+            transition: all 0.3s ease;
+        }
+        .btn-glow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(123, 97, 255, 0.4);
+        }
+        .table-custom {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .table-custom thead {
+            background: rgba(123, 97, 255, 0.15);
+            color: #9b82ff;
+        }
+        .table-custom tbody tr {
+            transition: all 0.2s ease;
+        }
+        .table-custom tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .page-title {
+            background: linear-gradient(45deg, #7b61ff, #9b82ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-calculator me-2"></i>Math Nexus
+            </a>
+            <div class="d-flex align-items-center">
+                <a href="{% url 'calci' %}" class="btn btn-sm btn-outline-light me-3">
+                    <i class="fas fa-calculator me-2"></i>Calculator
+                </a>
+                <a href="{% url 'home' %}" class="btn btn-sm btn-outline-light me-3">
+                    <i class="fas fa-home me-2"></i>Home
+                </a>
+                <a href="{% url 'signout' %}" class="btn btn-sm btn-danger">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <h2 class="page-title text-center mb-4">Operation Analytics</h2>
+
+        <div class="glass-card">
+            <form method="post" class="mb-4">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="form-label">Select Operation</label>
+                    {{ form.operation }}
+                </div>
+                <div class="d-grid gap-3 d-md-block">
+                    <button type="submit" name="get_users" class="btn btn-glow">
+                        <i class="fas fa-users me-2"></i>Get Users
+                    </button>
+                    <button type="submit" name="send_email" class="btn btn-glow">
+                        <i class="fas fa-envelope me-2"></i>Send Email
+                    </button>
+                </div>
+            </form>
+
+            {% if email_sent %}
+                <div class="alert alert-dark alert-dismissible fade show" role="alert"
+                     style="background: rgba(123, 97, 255, 0.15); border-color: #7b61ff;">
+                    <i class="fas fa-check-circle me-2"></i>Emails sent successfully!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" 
+                            style="filter: invert(1);"></button>
+                </div>
+            {% endif %}
+
+            {% if users %}
+                <div class="mt-4">
+                    <h4 class="mb-3">User Activity</h4>
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th><i class="fas fa-user me-2"></i>Username</th>
+                                    <th><i class="fas fa-envelope me-2"></i>Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for username, email in users %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ username }}</td>
+                                    <td>{{ email }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-users-slash fa-2x mb-3" style="color: #7b61ff;"></i>
+                    <p class="text-muted">No users found for the selected operation</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
